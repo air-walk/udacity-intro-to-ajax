@@ -23,9 +23,23 @@ function loadData() {
     $body.append('<img class="bgimg" src="' + streetviewUrl + '">');
 
 
-    // load nytimes
-    
-    // YOUR CODE GOES HERE!
+    // load nytimes and populate the website with articles
+    var NYTimesApiKey = "<Your-NYTimes-API-KEY-HERE>";
+    var NYTimesUrl    = "https://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + cityStr + "&api-key=" + NYTimesApiKey;
+    console.log(NYTimesUrl);
+
+    $.getJSON(NYTimesUrl, function(data) {
+        var articles = data.response.docs;
+
+        var items = [];
+        $.each(articles, function(index, article) {
+            var headline    = "<a href='"+ article['web_url'] + "'>" + article['headline']['main'] + "</a>";
+            var leadingPara = "<p>" + article['lead_paragraph'] + "</p>";
+            items.push("<li class='article'>" + headline + leadingPara + "</li>");
+        });
+
+        $("#nytimes-articles").append(items.join(""));
+    });
 
     return false;
 };
