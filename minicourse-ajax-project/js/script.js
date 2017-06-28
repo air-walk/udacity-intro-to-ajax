@@ -26,8 +26,7 @@ function loadData() {
     // load nytimes and populate the website with articles
     var NYTimesApiKey = "<Your-NYTimes-API-KEY-HERE>";
     var NYTimesUrl    = "https://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + cityStr + "&api-key=" + NYTimesApiKey;
-    console.log(NYTimesUrl);
-
+    
     $.getJSON(NYTimesUrl, function(data) {
         var articles = data.response.docs;
 
@@ -39,6 +38,9 @@ function loadData() {
         });
 
         $("#nytimes-articles").append(items.join(""));
+    })
+      .fail(function() {
+        $nytHeaderElem.text("New York Times Articles Could Not Be Loaded");
     });
 
     return false;
