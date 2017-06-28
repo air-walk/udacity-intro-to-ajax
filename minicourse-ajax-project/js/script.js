@@ -45,11 +45,24 @@ function loadData() {
     }).error(function(e){
         $nytHeaderElem.text('New York Times Articles Could Not Be Loaded');
     });
+    
+    // load wikipedia data    
+    var wikipediaUrl = "https://en.wikipedia.org/w/api.php?action=opensearch&search=" + cityStr + "&format=json&callback=wikiCallback";
 
+    $.ajax(
+        {
+          url:      wikipediaUrl,
+          dataType: "jsonp"
+        })
+      .done(function(data) {
+        var articles = data[1];
 
-    // load wikipedia data
-
-    // YOUR CODE GOES HERE!
+        for (var i = 0; i < articles.length; i++) {
+            var articleTitle = articles[i];
+            var url          = "https://en.wikipedia.org/wiki/" + articleTitle;
+            $wikiElem.append('<li><a href="' + url + '">' + articleTitle + '</a></li>');
+        }
+    });
 
     return false;
 };
