@@ -1,6 +1,9 @@
 
 function loadData() {
 
+    /*
+    The $ that shows up in variable names, like $body for example, is just a character like any other. In this case, it refers to the fact that the variable referenced by $body is a jQuery collection, not a DOM node.
+    */
     var $body = $('body');
     var $wikiElem = $('#wikipedia-links');
     var $nytHeaderElem = $('#nytimes-header');
@@ -23,25 +26,30 @@ function loadData() {
     $body.append('<img class="bgimg" src="' + streetviewUrl + '">');
 
 
-    // load nytimes and populate the website with articles
-    var NYTimesApiKey = "<Your-NYTimes-API-KEY-HERE>";
-    var NYTimesUrl    = "https://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + cityStr + "&api-key=" + NYTimesApiKey;
-    
-    $.getJSON(NYTimesUrl, function(data) {
-        var articles = data.response.docs;
+    // load nytimes
+    // obviously, replace all the "X"s with your own API key
+    var nytimesUrl = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + cityStr + '&sort=newest&api-key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+    $.getJSON(nytimesUrl, function(data){
 
-        var items = [];
-        $.each(articles, function(index, article) {
-            var headline    = "<a href='"+ article['web_url'] + "'>" + article['headline']['main'] + "</a>";
-            var leadingPara = "<p>" + article['lead_paragraph'] + "</p>";
-            items.push("<li class='article'>" + headline + leadingPara + "</li>");
-        });
+        $nytHeaderElem.text('New York Times Articles About ' + cityStr);
 
-        $("#nytimes-articles").append(items.join(""));
-    })
-      .fail(function() {
-        $nytHeaderElem.text("New York Times Articles Could Not Be Loaded");
+        articles = data.response.docs;
+        for (var i = 0; i < articles.length; i++) {
+            var article = articles[i];
+            $nytElem.append('<li class="article">'+
+                '<a href="'+article.web_url+'">'+article.headline.main+'</a>'+
+                '<p>' + article.snippet + '</p>'+
+            '</li>');
+        };
+
+    }).error(function(e){
+        $nytHeaderElem.text('New York Times Articles Could Not Be Loaded');
     });
+
+
+    // load wikipedia data
+
+    // YOUR CODE GOES HERE!
 
     return false;
 };
