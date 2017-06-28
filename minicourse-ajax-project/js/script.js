@@ -1,9 +1,6 @@
 
 function loadData() {
 
-    /*
-    The $ that shows up in variable names, like $body for example, is just a character like any other. In this case, it refers to the fact that the variable referenced by $body is a jQuery collection, not a DOM node.
-    */
     var $body = $('body');
     var $wikiElem = $('#wikipedia-links');
     var $nytHeaderElem = $('#nytimes-header');
@@ -20,10 +17,11 @@ function loadData() {
 
     $greeting.text('So, you want to live at ' + address + '?');
 
-
     // load streetview
     var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=600x400&location=' + address + '';
     $body.append('<img class="bgimg" src="' + streetviewUrl + '">');
+
+
 
 
     // load nytimes
@@ -45,28 +43,30 @@ function loadData() {
     }).error(function(e){
         $nytHeaderElem.text('New York Times Articles Could Not Be Loaded');
     });
-    
-    // load wikipedia data    
-    var wikipediaUrl = "https://en.wikipedia.org/w/api.php?action=opensearch&search=" + cityStr + "&format=json&callback=wikiCallback";
-    var wikiRequestTimeout = setTimeout(function() {
-        $wikiElem.text("Failed to get Wikipedia resources");
+
+
+
+    // load wikipedia data
+    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + cityStr + '&format=json&callback=wikiCallback';
+    var wikiRequestTimeout = setTimeout(function(){
+        $wikiElem.text("failed to get wikipedia resources");
     }, 8000);
 
-    $.ajax(
-        {
-          url:      wikipediaUrl,
-          dataType: "jsonp"
-        })
-      .done(function(data) {
-        var articles = data[1];
+    $.ajax({
+        url: wikiUrl,
+        dataType: "jsonp",
+        jsonp: "callback",
+        success: function( response ) {
+            var articleList = response[1];
 
-        for (var i = 0; i < articles.length; i++) {
-            var articleTitle = articles[i];
-            var url          = "https://en.wikipedia.org/wiki/" + articleTitle;
-            $wikiElem.append('<li><a href="' + url + '">' + articleTitle + '</a></li>');
+            for (var i = 0; i < articleList.length; i++) {
+                articleStr = articleList[i];
+                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
+                $wikiElem.append('<li><a href="' + url + '">' + articleStr + '</a></li>');
+            };
+
+            clearTimeout(wikiRequestTimeout);
         }
-
-        clearTimeout(wikiRequestTimeout);
     });
 
     return false;
